@@ -68,7 +68,7 @@ class ProductsViewController: UIViewController, UITableViewDelegate, UITableView
         tableView.backgroundColor = UIColor.lightBackgroundColor
         view.backgroundColor = UIColor.lightBackgroundColor
         textField.backgroundColor = UIColor.lightCyanColor
-        addGesturesToShopButtons()
+        configureShopButtons()
         addSwipeGestureToTableView()
         
         guard let shop1Name = userDefaults.string(forKey:"shop1Name"),
@@ -85,8 +85,9 @@ class ProductsViewController: UIViewController, UITableViewDelegate, UITableView
         updateUI()
     }
 
-    private func addGesturesToShopButtons() {
+    private func configureShopButtons() {
         for index in 0..<shopViews.count {
+            shopViews[index].layer.cornerRadius = shopViews[index].frame.height / 8
             let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(handleShopButtonTap(gesture:)))
             let longPressGestureRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPressOfShopButton(gesture:)))
             shopViews[index].addGestureRecognizer(tapGestureRecognizer)
