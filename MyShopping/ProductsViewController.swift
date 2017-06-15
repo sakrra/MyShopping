@@ -16,6 +16,7 @@ class ProductsViewController: UIViewController, UITableViewDelegate, UITableView
     
     @IBOutlet var shopViews: [UIView]!
     @IBOutlet var shopLabels: [UILabel]!
+    @IBOutlet weak var editButton: UIBarButtonItem!
     
     var shoppingList: ShoppingList?
     
@@ -63,6 +64,7 @@ class ProductsViewController: UIViewController, UITableViewDelegate, UITableView
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        navigationItem.setRightBarButton(UIBarButtonItem(title: "Edit", style: UIBarButtonItemStyle.plain, target: self, action: #selector(editButtonTapped(_:))), animated: false)
 
         shoppingList = try? ShoppingList.findOrCreateShoppingList(matching: "Shopping List", in: (container?.viewContext)!)
         tableView.backgroundColor = UIColor.lightBackgroundColor
@@ -163,9 +165,15 @@ class ProductsViewController: UIViewController, UITableViewDelegate, UITableView
         }
     }
     
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+    
+    @IBAction func editButtonTapped(_ sender: UIBarButtonItem) {
+        if tableView.isEditing {
+            navigationItem.rightBarButtonItem? = UIBarButtonItem(title: "Edit", style: .plain ,  target: self, action: #selector(editButtonTapped(_:))) //"Edit"
+            tableView.setEditing(false, animated: true)
+        } else {
+            navigationItem.rightBarButtonItem? = UIBarButtonItem(title: "Done", style: .done ,  target: self, action: #selector(editButtonTapped(_:))) //"Done"
+            tableView.setEditing(true, animated: true)
+        }
     }
 
     private func updateUI() {
@@ -240,6 +248,10 @@ class ProductsViewController: UIViewController, UITableViewDelegate, UITableView
         return true
     }
     
+    func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
+        print("moving")
+        
+    }
     /*func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
         if let context = container?.viewContext {
             if let product = fetchedResultsController?.object(at: indexPath) {
