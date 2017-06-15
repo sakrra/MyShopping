@@ -14,9 +14,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
 
-
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
+        let defaultSettings = UserDefaults.standard
+        defaultSettings.register(defaults: [SettingKeys.pickedItemsToBottomSetting: false])
+        defaultSettings.register(defaults: [SettingKeys.tableViewBackgroundColor: 0])
+        defaultSettings.register(defaults: ["shop1Name": "Shop1"])
+        defaultSettings.register(defaults: ["shop2Name": "Shop2"])
+        defaultSettings.register(defaults: ["shop3Name": "Shop3"])
+        defaultSettings.register(defaults: ["shop4Name": "Shop4"])
+        defaultSettings.register(defaults: ["selectedShopIndex": 0])
         return true
     }
 
