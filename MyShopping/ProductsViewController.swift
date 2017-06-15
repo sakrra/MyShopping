@@ -65,7 +65,6 @@ class ProductsViewController: UIViewController, UITableViewDelegate, UITableView
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.setRightBarButton(UIBarButtonItem(title: "Edit", style: UIBarButtonItemStyle.plain, target: self, action: #selector(editButtonTapped(_:))), animated: false)
-
         shoppingList = try? ShoppingList.findOrCreateShoppingList(matching: "Shopping List", in: (container?.viewContext)!)
         tableView.backgroundColor = UIColor.lightBackgroundColor
         view.backgroundColor = UIColor.lightBackgroundColor
@@ -85,6 +84,7 @@ class ProductsViewController: UIViewController, UITableViewDelegate, UITableView
                  Shop(name: shop3Name, isSelected: selectedShopIndex == 2),
                  Shop(name: shop4Name, isSelected: selectedShopIndex == 3)]
         updateUI()
+        printProducts()
     }
 
     private func configureShopButtons() {
@@ -170,6 +170,9 @@ class ProductsViewController: UIViewController, UITableViewDelegate, UITableView
         if tableView.isEditing {
             navigationItem.rightBarButtonItem? = UIBarButtonItem(title: "Edit", style: .plain ,  target: self, action: #selector(editButtonTapped(_:))) //"Edit"
             tableView.setEditing(false, animated: true)
+            if let context = container?.viewContext {
+                try? context.save()
+            }
         } else {
             navigationItem.rightBarButtonItem? = UIBarButtonItem(title: "Done", style: .done ,  target: self, action: #selector(editButtonTapped(_:))) //"Done"
             tableView.setEditing(true, animated: true)
@@ -250,18 +253,57 @@ class ProductsViewController: UIViewController, UITableViewDelegate, UITableView
     
     func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
         print("moving")
-        
-    }
-    /*func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
-        if let context = container?.viewContext {
-            if let product = fetchedResultsController?.object(at: indexPath) {
-                context.delete(product)
-                try? context.save()
+        // get moved cell
+        // update its order number for current selected shop
+        // update order numbers for cells from source to destination indexpaths like so:
+        // if moving down, decrease those order numbers
+        // if moving up, increase those order numbers
+        var sortingKey = "shop1OrderNumber"
+        for index in 0..<shops.count {
+            if shops[index].isSelected {
+                sortingKey = "shop\(index+1)OrderNumber"
             }
         }
-        
+        guard let movedProduct = fetchedResultsController?.object(at: sourceIndexPath) else {
+            return
+        }
+        movedProduct.setValue(destinationIndexPath.row+1, forKey: sortingKey)
+        if sourceIndexPath.row < destinationIndexPath.row {
+            for index in sourceIndexPath.row+1...destinationIndexPath.row {
+                if let product = fetchedResultsController?.object(at: IndexPath(row: index, section: 0)) {
+                    product.setValue(index, forKey: sortingKey)
+                }
+            }
+        } else {
+            for index in destinationIndexPath.row..<sourceIndexPath.row {
+                if let product = fetchedResultsController?.object(at: IndexPath(row: index, section: 0)) {
+                    product.setValue(index+2, forKey: sortingKey)
+                }
+            }
+        }
+        printProducts()
     }
-    */
+    
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
+        if editingStyle == .delete {
+            // handle deleting product
+            print("delete tapped")
+            if let product = fetchedResultsController?.object(at: indexPath) {
+                if let context = container?.viewContext {
+                    context.delete(product)
+                    try? context.save()
+                }
+            }
+        }
+    }
+    
+    // disable swipe delete when not in edit mode so swipe can be used to decrease item count
+    func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCellEditingStyle {
+        if tableView.isEditing {
+            return .delete
+        }
+        return .none
+    }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if let cell = tableView.cellForRow(at: indexPath) as? ProductTableViewCell {
@@ -310,16 +352,13 @@ class ProductsViewController: UIViewController, UITableViewDelegate, UITableView
     }
     
     private func printProducts() {
-        let request: NSFetchRequest<Product> = Product.fetchRequest()
-        if let context = container?.viewContext {
-            if let products = try? context.fetch(request) {
-                if products.count > 0 {
-                    print(products)
-                }
+        if let products = fetchedResultsController?.fetchedObjects {
+            for product in products {
+                print("product \(product.name) shop1OrderNumber = \(product.shop1OrderNumber)")
             }
         }
     }
-    
+
     // MARK: FetchedResultsController delegate
     public func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         tableView.beginUpdates()

@@ -28,6 +28,8 @@ class ShoppingListTableViewController: FetchedResultsTableViewController {
         }
     }
     
+    private let userDefaults = UserDefaults.standard
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -36,7 +38,6 @@ class ShoppingListTableViewController: FetchedResultsTableViewController {
 
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         // self.navigationItem.rightBarButtonItem = self.editButtonItem()
-        
         updateUI()
     }
 
@@ -60,6 +61,7 @@ class ShoppingListTableViewController: FetchedResultsTableViewController {
         backgroundImageView.image = UIImage(named: imageName)
         backgroundImageView.image = nil
         tableView.backgroundView = backgroundImageView
+        updateUI()
     }
     
     private func updateUI() {
@@ -67,9 +69,11 @@ class ShoppingListTableViewController: FetchedResultsTableViewController {
     }
     
     private func fetchData() {
+        let selectedShopIndex = userDefaults.integer(forKey: "selectedShopIndex")
+        let sortingKey = "shop\(selectedShopIndex+1)OrderNumber"
         if let context = container?.viewContext {
             let request: NSFetchRequest<Product> = Product.fetchRequest()
-            request.sortDescriptors = [NSSortDescriptor(key: Product.OrderNumberKey.shop1, ascending: true)]
+            request.sortDescriptors = [NSSortDescriptor(key: sortingKey, ascending: true)]
             request.predicate = NSPredicate(format: "ANY shoppingList.name LIKE[cd] %@", shoppingListName)
             fetchedResultsController = NSFetchedResultsController(
                 fetchRequest: request,
