@@ -38,6 +38,8 @@ class ShoppingListTableViewController: FetchedResultsTableViewController {
 
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         // self.navigationItem.rightBarButtonItem = self.editButtonItem()
+        tableView.contentInset = UIEdgeInsetsMake(3.0, 0.0, 0.0, 0.0)
+        
         updateUI()
     }
 
@@ -162,7 +164,13 @@ class ShoppingListTableViewController: FetchedResultsTableViewController {
             if let product = fetchedResultsController?.object(at: indexPath) {
                 if indexPath.section == 0 {
                     itemCell.productName = product.name
-                    itemCell.cellColor = UIColor.cellColor
+                    if product.isPicked {
+                        itemCell.cellColor = UIColor.cellSelectColor
+                        itemCell.strikeImageView.isHidden = false
+                    } else {
+                        itemCell.cellColor = UIColor.cellColor
+                        itemCell.strikeImageView.isHidden = true
+                    }
                     if product.count > 1 {
                         itemCell.itemCountLabel.isHidden = false
                         itemCell.itemCountLabel.text = String(product.count)
@@ -199,18 +207,16 @@ class ShoppingListTableViewController: FetchedResultsTableViewController {
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        /*if indexPath.section == 0 {
-            boughtProducts.insert(products[indexPath.row], at: 0)
-            products.remove(at: indexPath.row)
-            tableView.reloadData()
-            //tableView.reloadSections([0,1], with: .automatic)
-        } else {
-            products.append(boughtProducts[indexPath.row])
-            boughtProducts.remove(at: indexPath.row)
-            tableView.reloadSections([0,1], with: .automatic)
+        // 1. mark model to be picked
+        // 2. picked items should be marked accordingly (cellforrowat)
+        // 3. move picked items to end of the list or leave them, behavior is decided in settings.
+        if let context = container?.viewContext {
+            if let item = fetchedResultsController?.object(at: indexPath) {
+                item.isPicked = !item.isPicked
+                try? context.save()
+            }
         }
-        print("products = \(products)")
-        print("boughtProducts = \(boughtProducts)")*/
+        
     }
     
     /*

@@ -68,7 +68,7 @@ class ProductsViewController: UIViewController, UITableViewDelegate, UITableView
         shoppingList = try? ShoppingList.findOrCreateShoppingList(matching: "Shopping List", in: (container?.viewContext)!)
         tableView.backgroundColor = UIColor.lightBackgroundColor
         view.backgroundColor = UIColor.lightBackgroundColor
-        textField.backgroundColor = UIColor.lightCyanColor
+        textField.backgroundColor = UIColor.lightCyan
         configureShopButtons()
         addSwipeGestureToTableView()
         
@@ -186,7 +186,7 @@ class ProductsViewController: UIViewController, UITableViewDelegate, UITableView
             
             if shops[index].isSelected {
                 UIView.animate(withDuration: 0.3, animations: {
-                    self.shopViews[index].backgroundColor = UIColor.darkCyanColor
+                    self.shopViews[index].backgroundColor = UIColor.cellSelectColor
                 })
             } else  {
                 UIView.animate(withDuration: 0.3, animations: {
@@ -230,7 +230,7 @@ class ProductsViewController: UIViewController, UITableViewDelegate, UITableView
                 productCell.productName = product.name
                 //productCell.backgroundColor = UIColor.lightBackgroundColor
                 if product.count > 0 {
-                    productCell.cellColor = UIColor.darkCyanColor
+                    productCell.cellColor = UIColor.cellSelectColor
                     productCell.productCountLabel.isHidden = false
                 } else {
                     productCell.cellColor = UIColor.cellColor
