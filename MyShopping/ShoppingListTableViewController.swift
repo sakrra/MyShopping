@@ -28,6 +28,8 @@ class ShoppingListTableViewController: FetchedResultsTableViewController {
         }
     }
     
+    var shoppingList: ShoppingList?
+    
     private let userDefaults = UserDefaults.standard
     
     override func viewDidLoad() {
@@ -39,7 +41,8 @@ class ShoppingListTableViewController: FetchedResultsTableViewController {
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         // self.navigationItem.rightBarButtonItem = self.editButtonItem()
         tableView.contentInset = UIEdgeInsetsMake(3.0, 0.0, 0.0, 0.0)
-        
+        shoppingList = try? ShoppingList.findOrCreateShoppingList(matching: "Shopping List", in: (container?.viewContext)!)
+        addGestureRecognizers()
         updateUI()
     }
 
@@ -66,6 +69,64 @@ class ShoppingListTableViewController: FetchedResultsTableViewController {
         updateUI()
     }
     
+    private func addGestureRecognizers() {
+        let swipeLeftGesture = UISwipeGestureRecognizer(target: self, action: #selector(handleLeftSwipe(gesture:)))
+        swipeLeftGesture.direction = .left
+        let swipeRightGesture = UISwipeGestureRecognizer(target: self, action: #selector(handleRightSwipe(gesture:)))
+        swipeRightGesture.direction = .right
+        tableView.addGestureRecognizer(swipeLeftGesture)
+        tableView.addGestureRecognizer(swipeRightGesture)
+    }
+    
+    func handleLeftSwipe(gesture: UISwipeGestureRecognizer) {
+        let swipeLocation = gesture.location(in: tableView)
+        if let indexPath = tableView.indexPathForRow(at: swipeLocation) {
+            if let cell = tableView.cellForRow(at: indexPath) as? ShoppingListTableViewCell {
+                if let context = container?.viewContext {
+                    let item = try? Product.findOrCreateProduct(matching: cell.productName!, in: context)
+                    if item != nil {
+                        let oldCount = item!.count
+                        if oldCount > 0 {
+                            if oldCount == 1 {
+                                let actionSheet = UIAlertController(title: "Remove \(item!.name ?? "item")?", message: nil , preferredStyle: .alert)
+                                let yesAction = UIAlertAction(title: "Yes", style: .destructive) { alert in
+                                    item!.count = 0
+                                    self.shoppingList?.removeFromProducts(item!)
+                                }
+                                let noAction = UIAlertAction(title: "No", style: .default) { alert in
+                                    return
+                                }
+                                actionSheet.addAction(noAction)
+                                actionSheet.addAction(yesAction)
+                                self.present(actionSheet, animated: true)
+                               
+                            } else {
+                                item!.count = oldCount - 1
+                            }
+                        }
+                    }
+                    try? context.save()
+                }
+            }
+        }
+    }
+    
+    func handleRightSwipe(gesture: UISwipeGestureRecognizer) {
+        let swipeLocation = gesture.location(in: tableView)
+        if let indexPath = tableView.indexPathForRow(at: swipeLocation) {
+            if let cell = tableView.cellForRow(at: indexPath) as? ShoppingListTableViewCell {
+                if let context = container?.viewContext {
+                    let item = try? Product.findOrCreateProduct(matching: cell.productName!, in: context)
+                    if item != nil {
+                        let oldCount = item!.count
+                        item!.count = oldCount + 1
+                    }
+                    try? context.save()
+                }
+            }
+        }
+    }
+    
     private func updateUI() {
         fetchData()
     }
@@ -76,7 +137,7 @@ class ShoppingListTableViewController: FetchedResultsTableViewController {
         if let context = container?.viewContext {
             let request: NSFetchRequest<Product> = Product.fetchRequest()
             request.sortDescriptors = [NSSortDescriptor(key: sortingKey, ascending: true)]
-            request.predicate = NSPredicate(format: "ANY shoppingList.name LIKE[cd] %@", shoppingListName)
+            request.predicate = NSPredicate(format: "ANY shoppingList.name LIKE[cd] %@", shoppingList?.name ?? "Shopping List")
             fetchedResultsController = NSFetchedResultsController(
                 fetchRequest: request,
                 managedObjectContext: context,
@@ -92,7 +153,17 @@ class ShoppingListTableViewController: FetchedResultsTableViewController {
         let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
         let clearAllAction = UIAlertAction(title: "Clear All", style: .destructive) { action in
-            self.clearItems(all: true)
+            let actionSheet = UIAlertController(title: "Are you sure?", message: "Really remove all items?", preferredStyle: .alert)
+            let yesAction = UIAlertAction(title: "Yes", style: .destructive) { alert in
+                self.clearItems(all: true)
+            }
+            let noAction = UIAlertAction(title: "No", style: .default) { alert in
+                return
+            }
+            actionSheet.addAction(noAction)
+            actionSheet.addAction(yesAction)
+            self.present(actionSheet, animated: true)
+            
         }
         let clearPickedAction = UIAlertAction(title: "Clear Picked", style: .default) { action in
             self.clearItems(all: false)
@@ -113,26 +184,27 @@ class ShoppingListTableViewController: FetchedResultsTableViewController {
     
     private func clearItems(all: Bool) {
         
-        if all {
-            let actionSheet = UIAlertController(title: "Are you sure?", message: "Really delete all items?", preferredStyle: .alert)
-            let yesAction = UIAlertAction(title: "Yes", style: .destructive) { alert in
-            }
-            let noAction = UIAlertAction(title: "No", style: .default) { alert in
-                return
-            }
-            
-            actionSheet.addAction(yesAction)
-            actionSheet.addAction(noAction)
-            self.present(actionSheet, animated: true)
-        } else {
-            
-        }
         
         // really clear
         
-        
+        if let fetchedObjects = fetchedResultsController?.fetchedObjects {
+            for i in 0..<fetchedObjects.count {
+                let item = fetchedObjects[i]
+                if all {
+                    item.count = 0
+                    shoppingList?.removeFromProducts(item)
+                } else if item.isPicked {
+                    item.count = 0
+                    shoppingList?.removeFromProducts(item)
+                }
+            }
+        }
+        if let context = container?.viewContext {
+            try? context.save()
+        }
     }
     
+
     private func openSettings() {
         print("Settings opened")
         performSegue(withIdentifier: "showSettings", sender: nil)

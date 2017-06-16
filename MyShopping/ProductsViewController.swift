@@ -16,7 +16,6 @@ class ProductsViewController: UIViewController, UITableViewDelegate, UITableView
     
     @IBOutlet var shopViews: [UIView]!
     @IBOutlet var shopLabels: [UILabel]!
-    @IBOutlet weak var editButton: UIBarButtonItem!
     
     var shoppingList: ShoppingList?
     
@@ -50,6 +49,12 @@ class ProductsViewController: UIViewController, UITableViewDelegate, UITableView
         }
     }
     
+    enum ListOrder: Int {
+        case alphabetically
+        case recency
+        case shop
+    }
+    
     private func selectShop(_ selectedShop: Shop) {
         for index in 0..<shops.count {
             if shops[index] == selectedShop {
@@ -71,7 +76,6 @@ class ProductsViewController: UIViewController, UITableViewDelegate, UITableView
         textField.backgroundColor = UIColor.lightCyan
         configureShopButtons()
         addSwipeGestureToTableView()
-        
         guard let shop1Name = userDefaults.string(forKey:"shop1Name"),
             let shop2Name = userDefaults.string(forKey:"shop2Name"),
             let shop3Name = userDefaults.string(forKey:"shop3Name"),
@@ -130,6 +134,7 @@ class ProductsViewController: UIViewController, UITableViewDelegate, UITableView
             })
             alert.addTextField(configurationHandler: { textField in
                 textField.placeholder = "New name"
+                textField.autocapitalizationType = .sentences
             })
             alert.addAction(saveAction)
             alert.addAction(cancelAction)
@@ -139,21 +144,23 @@ class ProductsViewController: UIViewController, UITableViewDelegate, UITableView
     }
     
     func handleSwipe(gesture: UISwipeGestureRecognizer) {
-        let swipeLocation = gesture.location(in: tableView)
-        if let indexPath = tableView.indexPathForRow(at: swipeLocation) {
-            if let cell = tableView.cellForRow(at: indexPath) as? ProductTableViewCell {
-                if let context = container?.viewContext {
-                    let item = try? Product.findOrCreateProduct(matching: cell.productName!, in: context)
-                    if item != nil {
-                        let oldCount = item!.count
-                        if oldCount > 0 {
-                            item!.count = oldCount - 1
-                            if oldCount == 1 {
-                                shoppingList?.removeFromProducts(item!)
+        if !tableView.isEditing {
+            let swipeLocation = gesture.location(in: tableView)
+            if let indexPath = tableView.indexPathForRow(at: swipeLocation) {
+                if let cell = tableView.cellForRow(at: indexPath) as? ProductTableViewCell {
+                    if let context = container?.viewContext {
+                        let item = try? Product.findOrCreateProduct(matching: cell.productName!, in: context)
+                        if item != nil {
+                            let oldCount = item!.count
+                            if oldCount > 0 {
+                                item!.count = oldCount - 1
+                                if oldCount == 1 {
+                                    shoppingList?.removeFromProducts(item!)
+                                }
                             }
                         }
+                        try? context.save()
                     }
-                    try? context.save()
                 }
             }
         }
@@ -306,9 +313,28 @@ class ProductsViewController: UIViewController, UITableViewDelegate, UITableView
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if let cell = tableView.cellForRow(at: indexPath) as? ProductTableViewCell {
-            if let name = cell.productName {
-                addItemToList(name)
+        if tableView.isEditing {
+            if let product = fetchedResultsController?.object(at: indexPath) {
+                let alert = UIAlertController(title: "Rename \(product.name ?? "product")", message: "Enter new name", preferredStyle: .alert)
+                
+                let cancelAction = UIAlertAction(title: "Cancel", style: .cancel)
+                let saveAction = UIAlertAction(title: "Save", style: .default, handler: { (alertAction) in
+                    product.name = alert.textFields?[0].text
+                })
+                alert.addTextField(configurationHandler: { textField in
+                    textField.placeholder = "New name"
+                    textField.autocapitalizationType = .sentences
+                })
+                
+                alert.addAction(cancelAction)
+                alert.addAction(saveAction)
+                self.present(alert, animated: true)
+            }
+        } else {
+            if let cell = tableView.cellForRow(at: indexPath) as? ProductTableViewCell {
+                if let name = cell.productName {
+                    addItemToList(name)
+                }
             }
         }
     }
