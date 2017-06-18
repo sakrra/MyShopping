@@ -21,6 +21,7 @@ class ProductsViewController: UIViewController, UITableViewDelegate, UITableView
     @IBOutlet weak var sortByTimeButton: UIImageView!
     @IBOutlet weak var sortAlphabeticallyButton: UIImageView!
     
+    let defaultCornerRadius: CGFloat = 5.0
     
     var shoppingList: ShoppingList?
     
@@ -66,6 +67,12 @@ class ProductsViewController: UIViewController, UITableViewDelegate, UITableView
         }
     }
     
+    private var searchText: String? {
+        didSet {
+            fetchData()
+        }
+    }
+    
     private func selectShop(_ selectedShop: Shop) {
         for index in 0..<shops.count {
             if shops[index] == selectedShop {
@@ -83,8 +90,13 @@ class ProductsViewController: UIViewController, UITableViewDelegate, UITableView
         navigationItem.setRightBarButton(UIBarButtonItem(title: "Edit", style: UIBarButtonItemStyle.plain, target: self, action: #selector(editButtonTapped(_:))), animated: false)
         shoppingList = try? ShoppingList.findOrCreateShoppingList(matching: "Shopping List", in: (container?.viewContext)!)
         tableView.backgroundColor = UIColor.lightBackgroundColor
+        tableView.sectionIndexBackgroundColor = UIColor.lightBackgroundColor
+        tableView.sectionIndexColor = UIColor.darkBrownTextColor
         view.backgroundColor = UIColor.lightBackgroundColor
-        textField.backgroundColor = UIColor.lightCyan
+        textField.backgroundColor = UIColor.lightBackgroundColor
+        textField.layer.borderColor = UIColor.darkBrownTextColor.cgColor
+        textField.layer.borderWidth = 2.0
+        textField.layer.cornerRadius = defaultCornerRadius
         configureShopButtons()
         configureSortingButtons()
         addSwipeGestureToTableView()
@@ -109,7 +121,7 @@ class ProductsViewController: UIViewController, UITableViewDelegate, UITableView
 
     private func configureShopButtons() {
         for index in 0..<shopViews.count {
-            shopViews[index].layer.cornerRadius = shopViews[index].frame.height / 8
+            shopViews[index].layer.cornerRadius = defaultCornerRadius
             let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(handleShopButtonTap(gesture:)))
             let longPressGestureRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPressOfShopButton(gesture:)))
             shopViews[index].addGestureRecognizer(tapGestureRecognizer)
@@ -268,14 +280,18 @@ class ProductsViewController: UIViewController, UITableViewDelegate, UITableView
     private func fetchData() {
         var sortingKey = "shop1OrderNumber"
         var sortAscending = true
+        var sectionNameKeyPath: String?
+        
         switch listSortedBy {
         case .alphabetically:
             print("a-z")
             sortingKey = "name"
+            sectionNameKeyPath = "name"
         case .recency:
             print("time")
             sortingKey = "lastAddedToList"
             sortAscending = false
+            sectionNameKeyPath = nil
         case .shop:
             print("shop")
             for index in 0..<shops.count {
@@ -283,21 +299,31 @@ class ProductsViewController: UIViewController, UITableViewDelegate, UITableView
                     sortingKey = "shop\(index+1)OrderNumber"
                 }
             }
+            sectionNameKeyPath = nil
         }
         
         print("sortingKey = \(sortingKey)")
         if let context = container?.viewContext {
             let request: NSFetchRequest<Product> = Product.fetchRequest()
+            if let text = searchText {
+                let newText = "*\(text)*"
+                print("predicate text = \(text)")
+                request.predicate = NSPredicate(format: "name LIKE[cd] %@", newText)
+            }
             request.sortDescriptors = [NSSortDescriptor(key: sortingKey, ascending: sortAscending)]
             fetchedResultsController = NSFetchedResultsController(
                 fetchRequest: request,
                 managedObjectContext: context,
-                sectionNameKeyPath: nil,
+                sectionNameKeyPath: sectionNameKeyPath,
                 cacheName: nil)
             try? fetchedResultsController?.performFetch()
             fetchedResultsController?.delegate = self
             tableView.reloadData()
         }
+    }
+    
+    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        textField.resignFirstResponder()
     }
     
     // MARK: - Table view data source
@@ -417,7 +443,11 @@ class ProductsViewController: UIViewController, UITableViewDelegate, UITableView
         }
     }
     
-    // MARK: - TextField delegate
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 0.1
+    }
+    
+    // MARK: - TextField methods
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
@@ -425,8 +455,13 @@ class ProductsViewController: UIViewController, UITableViewDelegate, UITableView
             addItemToList(textField.text!)
         }
         textField.text = ""
+        searchText = nil
         return true
         
+    }
+
+    @IBAction func textFieldChanged(_ sender: UITextField) {
+        searchText = sender.text
     }
     
     // MARK: - help methods
@@ -494,7 +529,7 @@ class ProductsViewController: UIViewController, UITableViewDelegate, UITableView
         tableView.endUpdates()
     }
     
-    
+
     /*
     // MARK: - Navigation
 

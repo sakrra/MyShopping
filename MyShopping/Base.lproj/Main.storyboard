@@ -437,6 +437,7 @@
                                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences" autocorrectionType="no" returnKeyType="done"/>
                                                 <connections>
+                                                    <action selector="textFieldChanged:" destination="fjJ-FG-GDa" eventType="editingChanged" id="nrj-hH-pdO"/>
                                                     <outlet property="delegate" destination="fjJ-FG-GDa" id="A9o-gR-xBn"/>
                                                 </connections>
                                             </textField>

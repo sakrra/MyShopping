@@ -27,11 +27,11 @@ extension ProductsViewController
     }
     
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        if let sections = fetchedResultsController?.sections, sections.count > 0 {
-            return sections[section].name
-        } else {
+        //if let sections = fetchedResultsController?.sections, sections.count > 0 {
+        //    return sections[section].name
+        //} else {
             return nil
-        }
+        //}
     }
     
     func sectionIndexTitles(for tableView: UITableView) -> [String]? {

@@ -37,7 +37,7 @@ class ShoppingListTableViewCell: UITableViewCell {
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
-        cellBackgroundView.layer.cornerRadius = cellBackgroundView.frame.height / 4
+        cellBackgroundView.layer.cornerRadius = 5.0
         contentView.backgroundColor = UIColor.clear
         selectionStyle = .none
         strikeImageView.backgroundColor = UIColor.strikeColor
