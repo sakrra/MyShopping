@@ -118,6 +118,7 @@
 		267F560F1EC46747007C6D0B = {
 			isa = PBXGroup;
 			children = (
+				26E40BC01ED5A97A00DABE4A /* Model */,
 				267F561A1EC46747007C6D0B /* MyShopping */,
 				267F56321EC46747007C6D0B /* MyShoppingTests */,
 				267F563D1EC46747007C6D0B /* MyShoppingUITests */,
@@ -140,7 +141,6 @@
 		267F561A1EC46747007C6D0B /* MyShopping */ = {
 			isa = PBXGroup;
 			children = (
-				26E40BC01ED5A97A00DABE4A /* Model */,
 				267F561B1EC46747007C6D0B /* AppDelegate.swift */,
 				267F561F1EC46747007C6D0B /* Main.storyboard */,
 				267F564C1EC47F6F007C6D0B /* ShoppingListTableViewController.swift */,
@@ -187,6 +187,7 @@
 				267F56521EC48191007C6D0B /* Category.swift */,
 			);
 			name = Model;
+			path = MyShopping;
 			sourceTree = "<group>";
 		};
 		A43C15B349827A3F292D23C0 /* Pods */ = {

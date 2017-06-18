@@ -6,6 +6,7 @@
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12089"/>
+        <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -277,7 +278,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" indicatorStyle="black" dataMode="prototypes" style="plain" separatorStyle="none" allowsSelectionDuringEditing="YES" rowHeight="35" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="kc3-dN-pbg">
-                                <rect key="frame" x="0.0" y="159" width="414" height="577"/>
+                                <rect key="frame" x="0.0" y="163" width="414" height="573"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="productCell" id="T1o-RD-bWs" customClass="ProductTableViewCell" customModule="MyShopping" customModuleProvider="target">
@@ -426,8 +427,27 @@
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="p6g-vn-f9X">
                                 <rect key="frame" x="0.0" y="119" width="414" height="40"/>
                                 <subviews>
-                                    <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Add or Search Item" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="dbT-lg-3dK">
-                                        <rect key="frame" x="8" y="2" width="398" height="30"/>
+                                    <imageView contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="sort-shop" translatesAutoresizingMaskIntoConstraints="NO" id="ZHG-mt-dY6">
+                                        <rect key="frame" x="8" y="5" width="30" height="30"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" secondItem="ZHG-mt-dY6" secondAttribute="height" multiplier="1:1" id="Xup-1N-GCj"/>
+                                            <constraint firstAttribute="height" constant="30" id="xkw-is-Cpz"/>
+                                        </constraints>
+                                    </imageView>
+                                    <imageView contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="sort-time" translatesAutoresizingMaskIntoConstraints="NO" id="8UK-5O-SQg">
+                                        <rect key="frame" x="46" y="5" width="30" height="30"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" secondItem="8UK-5O-SQg" secondAttribute="height" multiplier="1:1" id="Cls-b6-zqj"/>
+                                        </constraints>
+                                    </imageView>
+                                    <imageView contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="sort-az" translatesAutoresizingMaskIntoConstraints="NO" id="ecb-bi-b6Z">
+                                        <rect key="frame" x="84" y="5.3333333333333286" width="30" height="30.000000000000014"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" secondItem="ecb-bi-b6Z" secondAttribute="height" multiplier="1:1" id="Ari-ou-KA8"/>
+                                        </constraints>
+                                    </imageView>
+                                    <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Add or Search Item" textAlignment="center" minimumFontSize="17" clearButtonMode="whileEditing" translatesAutoresizingMaskIntoConstraints="NO" id="dbT-lg-3dK">
+                                        <rect key="frame" x="122" y="5" width="284" height="30"/>
                                         <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                                         <nil key="textColor"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="14"/>
@@ -438,10 +458,18 @@
                                     </textField>
                                 </subviews>
                                 <constraints>
-                                    <constraint firstItem="dbT-lg-3dK" firstAttribute="top" secondItem="p6g-vn-f9X" secondAttribute="top" constant="2" id="2qu-lq-xbG"/>
+                                    <constraint firstItem="ZHG-mt-dY6" firstAttribute="leading" secondItem="p6g-vn-f9X" secondAttribute="leading" constant="8" id="0A0-y4-qjg"/>
                                     <constraint firstItem="dbT-lg-3dK" firstAttribute="trailing" secondItem="p6g-vn-f9X" secondAttribute="trailingMargin" id="2xe-7R-AK1"/>
+                                    <constraint firstItem="ZHG-mt-dY6" firstAttribute="centerY" secondItem="p6g-vn-f9X" secondAttribute="centerY" id="4lW-mq-LnM"/>
+                                    <constraint firstItem="8UK-5O-SQg" firstAttribute="height" secondItem="ZHG-mt-dY6" secondAttribute="height" id="ASF-09-PJ2"/>
+                                    <constraint firstItem="ecb-bi-b6Z" firstAttribute="height" secondItem="ZHG-mt-dY6" secondAttribute="height" id="C3M-8n-RLL"/>
+                                    <constraint firstItem="ecb-bi-b6Z" firstAttribute="leading" secondItem="8UK-5O-SQg" secondAttribute="trailing" constant="8" id="EMy-UN-kaG"/>
+                                    <constraint firstItem="8UK-5O-SQg" firstAttribute="leading" secondItem="ZHG-mt-dY6" secondAttribute="trailing" constant="8" id="I0H-iP-9hi"/>
+                                    <constraint firstItem="ecb-bi-b6Z" firstAttribute="centerY" secondItem="p6g-vn-f9X" secondAttribute="centerY" id="PKw-qV-2Tc"/>
+                                    <constraint firstItem="8UK-5O-SQg" firstAttribute="centerY" secondItem="p6g-vn-f9X" secondAttribute="centerY" id="PXz-ZY-ck2"/>
+                                    <constraint firstItem="dbT-lg-3dK" firstAttribute="centerY" secondItem="p6g-vn-f9X" secondAttribute="centerY" id="RfC-xA-nwh"/>
                                     <constraint firstAttribute="height" constant="40" id="f1O-8T-71k"/>
-                                    <constraint firstItem="dbT-lg-3dK" firstAttribute="leading" secondItem="p6g-vn-f9X" secondAttribute="leadingMargin" id="pXB-rs-0wL"/>
+                                    <constraint firstItem="dbT-lg-3dK" firstAttribute="leading" secondItem="ecb-bi-b6Z" secondAttribute="trailing" constant="8" id="odH-3I-Oq9"/>
                                 </constraints>
                             </view>
                         </subviews>
@@ -452,7 +480,7 @@
                             <constraint firstItem="kc3-dN-pbg" firstAttribute="width" secondItem="adZ-v3-Uja" secondAttribute="width" id="YDP-7w-pUr"/>
                             <constraint firstItem="kc3-dN-pbg" firstAttribute="centerX" secondItem="adZ-v3-Uja" secondAttribute="centerX" id="Znd-qy-NJ7"/>
                             <constraint firstItem="Byo-yp-LTR" firstAttribute="centerX" secondItem="adZ-v3-Uja" secondAttribute="centerX" id="a8X-gz-fVU"/>
-                            <constraint firstItem="kc3-dN-pbg" firstAttribute="top" secondItem="p6g-vn-f9X" secondAttribute="bottom" id="ard-K1-cql"/>
+                            <constraint firstItem="kc3-dN-pbg" firstAttribute="top" secondItem="p6g-vn-f9X" secondAttribute="bottom" constant="4" id="ard-K1-cql"/>
                             <constraint firstItem="i0C-UU-1ev" firstAttribute="top" secondItem="kc3-dN-pbg" secondAttribute="bottom" id="fE4-cD-9WK"/>
                             <constraint firstItem="p6g-vn-f9X" firstAttribute="width" secondItem="adZ-v3-Uja" secondAttribute="width" id="pOE-il-HdD"/>
                             <constraint firstItem="Byo-yp-LTR" firstAttribute="top" secondItem="zCb-1f-6WY" secondAttribute="bottom" id="peL-bs-94O"/>
@@ -460,6 +488,9 @@
                     </view>
                     <navigationItem key="navigationItem" title="Add Items" id="k5D-fp-PTP"/>
                     <connections>
+                        <outlet property="sortAlphabeticallyButton" destination="ecb-bi-b6Z" id="RFM-Fo-hrb"/>
+                        <outlet property="sortByShopButton" destination="ZHG-mt-dY6" id="hM8-zr-Do8"/>
+                        <outlet property="sortByTimeButton" destination="8UK-5O-SQg" id="HfN-Y0-NE7"/>
                         <outlet property="tableView" destination="kc3-dN-pbg" id="Sxc-0p-bd8"/>
                         <outlet property="textField" destination="dbT-lg-3dK" id="d8K-zX-H7v"/>
                         <outletCollection property="shopViews" destination="1cX-nf-pEt" collectionClass="NSMutableArray" id="XrF-2Q-5jn"/>
@@ -477,4 +508,9 @@
             <point key="canvasLocation" x="2111.594202898551" y="14.673913043478262"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="sort-az" width="30" height="30"/>
+        <image name="sort-shop" width="30" height="30"/>
+        <image name="sort-time" width="30" height="30"/>
+    </resources>
 </document>

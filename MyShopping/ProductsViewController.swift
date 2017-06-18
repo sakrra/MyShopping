@@ -17,6 +17,11 @@ class ProductsViewController: UIViewController, UITableViewDelegate, UITableView
     @IBOutlet var shopViews: [UIView]!
     @IBOutlet var shopLabels: [UILabel]!
     
+    @IBOutlet weak var sortByShopButton: UIImageView!
+    @IBOutlet weak var sortByTimeButton: UIImageView!
+    @IBOutlet weak var sortAlphabeticallyButton: UIImageView!
+    
+    
     var shoppingList: ShoppingList?
     
     private let userDefaults = UserDefaults.standard
@@ -55,6 +60,12 @@ class ProductsViewController: UIViewController, UITableViewDelegate, UITableView
         case shop
     }
     
+    private var listSortedBy = ListOrder.shop {
+        didSet {
+            updateUI()
+        }
+    }
+    
     private func selectShop(_ selectedShop: Shop) {
         for index in 0..<shops.count {
             if shops[index] == selectedShop {
@@ -75,6 +86,7 @@ class ProductsViewController: UIViewController, UITableViewDelegate, UITableView
         view.backgroundColor = UIColor.lightBackgroundColor
         textField.backgroundColor = UIColor.lightCyan
         configureShopButtons()
+        configureSortingButtons()
         addSwipeGestureToTableView()
         guard let shop1Name = userDefaults.string(forKey:"shop1Name"),
             let shop2Name = userDefaults.string(forKey:"shop2Name"),
@@ -99,6 +111,20 @@ class ProductsViewController: UIViewController, UITableViewDelegate, UITableView
             shopViews[index].addGestureRecognizer(tapGestureRecognizer)
             shopViews[index].addGestureRecognizer(longPressGestureRecognizer)
         }
+    }
+
+    private func configureSortingButtons() {
+        sortByShopButton.tintColor = UIColor.darkCyan
+        let tapToShopSortButtonGesture = UITapGestureRecognizer(target: self, action: #selector(handleSortByShopButtonTap(gesture:)))
+        sortByShopButton.addGestureRecognizer(tapToShopSortButtonGesture)
+        
+        sortByTimeButton.tintColor = UIColor.darkCyan
+        let tapToTimeSortButtonGesture = UITapGestureRecognizer(target: self, action: #selector(handleSortByTimeButtonTap(gesture:)))
+        sortByTimeButton.addGestureRecognizer(tapToTimeSortButtonGesture)
+        
+        sortAlphabeticallyButton.tintColor = UIColor.darkCyan
+        let tapToAlphabeticalSortButtonGesture = UITapGestureRecognizer(target: self, action: #selector(handleSortAlphabeticallyButtonTap(gesture:)))
+        sortAlphabeticallyButton.addGestureRecognizer(tapToAlphabeticalSortButtonGesture)
     }
     
     private func addSwipeGestureToTableView() {
@@ -166,6 +192,32 @@ class ProductsViewController: UIViewController, UITableViewDelegate, UITableView
         }
     }
     
+    func handleSortByShopButtonTap(gesture: UITapGestureRecognizer) {
+        handleSorting(orderedBy: .shop)
+    }
+    
+    func handleSortByTimeButtonTap(gesture: UITapGestureRecognizer) {
+        handleSorting(orderedBy: .recency)
+    }
+    
+    func handleSortAlphabeticallyButtonTap(gesture: UITapGestureRecognizer) {
+        handleSorting(orderedBy: .alphabetically)
+    }
+    
+    private func handleSorting(orderedBy: ListOrder) {
+        switch orderedBy {
+        case .alphabetically:
+            print("alphabetically")
+            listSortedBy = .alphabetically
+        case .recency:
+            print("by time")
+            listSortedBy = .recency
+        case .shop:
+            print("by shop")
+            listSortedBy = .shop
+        }
+    }
+    
     private func saveButtonTitlesToUserDefaults() {
         for index in 0..<shops.count {
             userDefaults.set(shops[index].name, forKey: "shop\(index+1)Name")
@@ -197,7 +249,7 @@ class ProductsViewController: UIViewController, UITableViewDelegate, UITableView
                 })
             } else  {
                 UIView.animate(withDuration: 0.3, animations: {
-                    self.shopViews[index].backgroundColor = UIColor.white
+                    self.shopViews[index].backgroundColor = UIColor.cellColor
                 })
             }
         }
