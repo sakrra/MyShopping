@@ -24,6 +24,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         defaultSettings.register(defaults: ["shop3Name": "Shop3"])
         defaultSettings.register(defaults: ["shop4Name": "Shop4"])
         defaultSettings.register(defaults: ["selectedShopIndex": 0])
+        defaultSettings.register(defaults: ["productListsSorting": 0]) // 0 = a-z, 1 for recency, 2 ny shop.
         return true
     }
 

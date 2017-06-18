@@ -13,3 +13,4 @@ struct SettingKeys {
     static let tableViewBackgroundColor = "tableViewBackgroundColor"
     static let pickedItemsToBottomSetting = "pickedItemsToBottomSetting"
 }
+    

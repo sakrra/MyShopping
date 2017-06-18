@@ -95,6 +95,10 @@ class ProductsViewController: UIViewController, UITableViewDelegate, UITableView
                 return
         }
         let selectedShopIndex = userDefaults.integer(forKey: "selectedShopIndex")
+        let productListSorting = userDefaults.integer(forKey: "productListsSorting")
+        
+        listSortedBy = ListOrder(rawValue: productListSorting) ?? .shop
+        
         shops = [Shop(name: shop1Name, isSelected: selectedShopIndex == 0),
                  Shop(name: shop2Name, isSelected: selectedShopIndex == 1),
                  Shop(name: shop3Name, isSelected: selectedShopIndex == 2),
@@ -114,15 +118,15 @@ class ProductsViewController: UIViewController, UITableViewDelegate, UITableView
     }
 
     private func configureSortingButtons() {
-        sortByShopButton.tintColor = UIColor.darkCyan
+        sortByShopButton.tintColor = UIColor.darkBrownTextColor
         let tapToShopSortButtonGesture = UITapGestureRecognizer(target: self, action: #selector(handleSortByShopButtonTap(gesture:)))
         sortByShopButton.addGestureRecognizer(tapToShopSortButtonGesture)
         
-        sortByTimeButton.tintColor = UIColor.darkCyan
+        sortByTimeButton.tintColor = UIColor.darkBrownTextColor
         let tapToTimeSortButtonGesture = UITapGestureRecognizer(target: self, action: #selector(handleSortByTimeButtonTap(gesture:)))
         sortByTimeButton.addGestureRecognizer(tapToTimeSortButtonGesture)
         
-        sortAlphabeticallyButton.tintColor = UIColor.darkCyan
+        sortAlphabeticallyButton.tintColor = UIColor.darkBrownTextColor
         let tapToAlphabeticalSortButtonGesture = UITapGestureRecognizer(target: self, action: #selector(handleSortAlphabeticallyButtonTap(gesture:)))
         sortAlphabeticallyButton.addGestureRecognizer(tapToAlphabeticalSortButtonGesture)
     }
@@ -193,29 +197,18 @@ class ProductsViewController: UIViewController, UITableViewDelegate, UITableView
     }
     
     func handleSortByShopButtonTap(gesture: UITapGestureRecognizer) {
-        handleSorting(orderedBy: .shop)
+        listSortedBy = .shop
+        userDefaults.set(ListOrder.shop.rawValue, forKey: "productListsSorting")
     }
     
     func handleSortByTimeButtonTap(gesture: UITapGestureRecognizer) {
-        handleSorting(orderedBy: .recency)
+        listSortedBy = .recency
+        userDefaults.set(ListOrder.recency.rawValue, forKey: "productListsSorting")
     }
     
     func handleSortAlphabeticallyButtonTap(gesture: UITapGestureRecognizer) {
-        handleSorting(orderedBy: .alphabetically)
-    }
-    
-    private func handleSorting(orderedBy: ListOrder) {
-        switch orderedBy {
-        case .alphabetically:
-            print("alphabetically")
-            listSortedBy = .alphabetically
-        case .recency:
-            print("by time")
-            listSortedBy = .recency
-        case .shop:
-            print("by shop")
-            listSortedBy = .shop
-        }
+        listSortedBy = .alphabetically
+        userDefaults.set(ListOrder.alphabetically.rawValue, forKey: "productListsSorting")
     }
     
     private func saveButtonTitlesToUserDefaults() {
@@ -223,7 +216,6 @@ class ProductsViewController: UIViewController, UITableViewDelegate, UITableView
             userDefaults.set(shops[index].name, forKey: "shop\(index+1)Name")
         }
     }
-    
     
     @IBAction func editButtonTapped(_ sender: UIBarButtonItem) {
         if tableView.isEditing {
@@ -240,6 +232,23 @@ class ProductsViewController: UIViewController, UITableViewDelegate, UITableView
 
     private func updateUI() {
         // update selected shop and shop labels
+        switch listSortedBy {
+        case .alphabetically:
+            print("alphabetically")
+            sortAlphabeticallyButton.image = UIImage(named: "sort-az-selected")
+            sortByTimeButton.image = UIImage(named: "sort-time")
+            sortByShopButton.image = UIImage(named: "sort-shop")
+        case .recency:
+            print("by time")
+            sortByTimeButton.image = UIImage(named: "sort-time-selected")
+            sortAlphabeticallyButton.image = UIImage(named: "sort-az")
+            sortByShopButton.image = UIImage(named: "sort-shop")
+        case .shop:
+            print("by shop")
+            sortByShopButton.image = UIImage(named: "sort-shop-selected")
+            sortByTimeButton.image = UIImage(named: "sort-time")
+            sortAlphabeticallyButton.image = UIImage(named: "sort-az")
+        }
         for index in 0..<shopViews.count {
             shopLabels[index].text = shops[index].name
             
@@ -258,15 +267,28 @@ class ProductsViewController: UIViewController, UITableViewDelegate, UITableView
     
     private func fetchData() {
         var sortingKey = "shop1OrderNumber"
-        for index in 0..<shops.count {
-            if shops[index].isSelected {
-                sortingKey = "shop\(index+1)OrderNumber"
+        var sortAscending = true
+        switch listSortedBy {
+        case .alphabetically:
+            print("a-z")
+            sortingKey = "name"
+        case .recency:
+            print("time")
+            sortingKey = "lastAddedToList"
+            sortAscending = false
+        case .shop:
+            print("shop")
+            for index in 0..<shops.count {
+                if shops[index].isSelected {
+                    sortingKey = "shop\(index+1)OrderNumber"
+                }
             }
         }
+        
         print("sortingKey = \(sortingKey)")
         if let context = container?.viewContext {
             let request: NSFetchRequest<Product> = Product.fetchRequest()
-            request.sortDescriptors = [NSSortDescriptor(key: sortingKey, ascending: true)]
+            request.sortDescriptors = [NSSortDescriptor(key: sortingKey, ascending: sortAscending)]
             fetchedResultsController = NSFetchedResultsController(
                 fetchRequest: request,
                 managedObjectContext: context,
@@ -303,7 +325,11 @@ class ProductsViewController: UIViewController, UITableViewDelegate, UITableView
     }
     
     func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-        return true
+        if listSortedBy == .shop {
+            return true
+        } else {
+            return false
+        }
     }
     
     func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
