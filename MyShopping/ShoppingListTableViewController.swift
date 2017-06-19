@@ -11,6 +11,8 @@ import CoreData
 
 class ShoppingListTableViewController: FetchedResultsTableViewController {
 
+    let colorTheme = AppColors.Theme1()
+    
     var fetchedResultsController: NSFetchedResultsController<Product>?
     
     // imageArray for background images, tuple with name and boolean to indicate if image is dark.
@@ -40,7 +42,7 @@ class ShoppingListTableViewController: FetchedResultsTableViewController {
 
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         // self.navigationItem.rightBarButtonItem = self.editButtonItem()
-        tableView.contentInset = UIEdgeInsetsMake(3.0, 0.0, 0.0, 0.0)
+        tableView.contentInset = UIEdgeInsetsMake(3.0, 0.0, 3.0, 0.0)
         shoppingList = try? ShoppingList.findOrCreateShoppingList(matching: "Shopping List", in: (container?.viewContext)!)
         addGestureRecognizers()
         updateUI()
@@ -48,7 +50,7 @@ class ShoppingListTableViewController: FetchedResultsTableViewController {
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        tableView.backgroundColor = UIColor.lightBackgroundColor
+        tableView.backgroundColor = colorTheme.lightBackgroundColor
         let frame = tableView.frame
         let backgroundImageView = UIImageView(frame: frame)
         let randomImageNumber = 5.randomNumber()
@@ -237,10 +239,10 @@ class ShoppingListTableViewController: FetchedResultsTableViewController {
                 if indexPath.section == 0 {
                     itemCell.productName = product.name
                     if product.isPicked {
-                        itemCell.cellColor = UIColor.cellSelectColor
+                        itemCell.cellColor = colorTheme.cellSelectColor
                         itemCell.strikeImageView.isHidden = false
                     } else {
-                        itemCell.cellColor = UIColor.cellColor
+                        itemCell.cellColor = colorTheme.cellColor
                         itemCell.strikeImageView.isHidden = true
                     }
                     if product.count > 1 {
@@ -330,7 +332,8 @@ class ShoppingListTableViewController: FetchedResultsTableViewController {
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+    /*
+     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         // Get the new view controller using segue.destinationViewController.
         // Pass the selected object to the new view controller.
         if segue.identifier == "addItems" {
@@ -338,6 +341,7 @@ class ShoppingListTableViewController: FetchedResultsTableViewController {
             }
         }
     }
+     */
 
 }
 

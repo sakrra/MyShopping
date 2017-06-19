@@ -13,7 +13,8 @@ import CoreData
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
-
+    let colorTheme = AppColors.Theme1()
+    
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         let defaultSettings = UserDefaults.standard
@@ -25,6 +26,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         defaultSettings.register(defaults: ["shop4Name": "Shop4"])
         defaultSettings.register(defaults: ["selectedShopIndex": 0])
         defaultSettings.register(defaults: ["productListsSorting": 0]) // 0 = a-z, 1 for recency, 2 ny shop.
+        
+        // navigation bar and status bar appearance
+        let navigationBarAppearace = UINavigationBar.appearance()
+        navigationBarAppearace.tintColor = UIColor.white
+        navigationBarAppearace.barTintColor = colorTheme.darkestColor
+        let attributes = [NSForegroundColorAttributeName:UIColor.white, NSFontAttributeName: UIFont(name: "Noteworthy", size: 20)]
+        navigationBarAppearace.titleTextAttributes = attributes
+        UIApplication.shared.statusBarStyle = .lightContent
         return true
     }
 

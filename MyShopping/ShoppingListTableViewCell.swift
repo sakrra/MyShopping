@@ -18,6 +18,8 @@ class ShoppingListTableViewCell: UITableViewCell {
     
     @IBOutlet weak var strikeImageView: UIImageView!
     
+    let colorTheme = AppColors.Theme1()
+    
     var productName: String? {
         didSet { updateUI() }
     }
@@ -40,7 +42,7 @@ class ShoppingListTableViewCell: UITableViewCell {
         cellBackgroundView.layer.cornerRadius = 5.0
         contentView.backgroundColor = UIColor.clear
         selectionStyle = .none
-        strikeImageView.backgroundColor = UIColor.strikeColor
+        strikeImageView.backgroundColor = colorTheme.strikeColor
     }
 
     override func layoutSubviews() {

@@ -14,6 +14,8 @@ class ProductTableViewCell: UITableViewCell {
     @IBOutlet weak var productCountLabel: UILabel!
     @IBOutlet weak var cellBackgroundView: UIView!
 
+    let colorTheme = AppColors.Theme1()
+    
     var productName: String? {
         didSet { updateUI() }
     }

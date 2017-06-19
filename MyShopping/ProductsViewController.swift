@@ -23,6 +23,8 @@ class ProductsViewController: UIViewController, UITableViewDelegate, UITableView
     
     let defaultCornerRadius: CGFloat = 5.0
     
+    let colorTheme = AppColors.Theme1()
+    
     var shoppingList: ShoppingList?
     
     private let userDefaults = UserDefaults.standard
@@ -89,12 +91,13 @@ class ProductsViewController: UIViewController, UITableViewDelegate, UITableView
         super.viewDidLoad()
         navigationItem.setRightBarButton(UIBarButtonItem(title: "Edit", style: UIBarButtonItemStyle.plain, target: self, action: #selector(editButtonTapped(_:))), animated: false)
         shoppingList = try? ShoppingList.findOrCreateShoppingList(matching: "Shopping List", in: (container?.viewContext)!)
-        tableView.backgroundColor = UIColor.lightBackgroundColor
-        tableView.sectionIndexBackgroundColor = UIColor.lightBackgroundColor
-        tableView.sectionIndexColor = UIColor.darkBrownTextColor
-        view.backgroundColor = UIColor.lightBackgroundColor
-        textField.backgroundColor = UIColor.lightBackgroundColor
-        textField.layer.borderColor = UIColor.darkBrownTextColor.cgColor
+        tableView.backgroundColor = colorTheme.lightBackgroundColor
+        tableView.sectionIndexBackgroundColor = colorTheme.lightBackgroundColor
+        tableView.sectionIndexColor = colorTheme.darkestColor
+        tableView.contentInset = UIEdgeInsetsMake(0.0, 0.0, 3.0, 0.0)
+        view.backgroundColor = colorTheme.lightBackgroundColor
+        textField.backgroundColor = colorTheme.lightBackgroundColor
+        textField.layer.borderColor = colorTheme.darkestColor.cgColor
         textField.layer.borderWidth = 2.0
         textField.layer.cornerRadius = defaultCornerRadius
         let textFieldSwipeGesture = UISwipeGestureRecognizer(target: self, action: #selector(handleTextFieldSwipe(gesture:)))
@@ -135,15 +138,15 @@ class ProductsViewController: UIViewController, UITableViewDelegate, UITableView
     }
 
     private func configureSortingButtons() {
-        sortByShopButton.tintColor = UIColor.darkBrownTextColor
+        sortByShopButton.tintColor = colorTheme.darkestColor
         let tapToShopSortButtonGesture = UITapGestureRecognizer(target: self, action: #selector(handleSortByShopButtonTap(gesture:)))
         sortByShopButton.addGestureRecognizer(tapToShopSortButtonGesture)
         
-        sortByTimeButton.tintColor = UIColor.darkBrownTextColor
+        sortByTimeButton.tintColor = colorTheme.darkestColor
         let tapToTimeSortButtonGesture = UITapGestureRecognizer(target: self, action: #selector(handleSortByTimeButtonTap(gesture:)))
         sortByTimeButton.addGestureRecognizer(tapToTimeSortButtonGesture)
         
-        sortAlphabeticallyButton.tintColor = UIColor.darkBrownTextColor
+        sortAlphabeticallyButton.tintColor = colorTheme.darkestColor
         let tapToAlphabeticalSortButtonGesture = UITapGestureRecognizer(target: self, action: #selector(handleSortAlphabeticallyButtonTap(gesture:)))
         sortAlphabeticallyButton.addGestureRecognizer(tapToAlphabeticalSortButtonGesture)
     }
@@ -279,11 +282,11 @@ class ProductsViewController: UIViewController, UITableViewDelegate, UITableView
             
             if shops[index].isSelected {
                 UIView.animate(withDuration: 0.3, animations: {
-                    self.shopViews[index].backgroundColor = UIColor.cellSelectColor
+                    self.shopViews[index].backgroundColor = self.colorTheme.cellSelectColor
                 })
             } else  {
                 UIView.animate(withDuration: 0.3, animations: {
-                    self.shopViews[index].backgroundColor = UIColor.cellColor
+                    self.shopViews[index].backgroundColor = self.colorTheme.cellColor
                 })
             }
         }
@@ -382,10 +385,10 @@ class ProductsViewController: UIViewController, UITableViewDelegate, UITableView
                 productCell.productName = product.name
                 //productCell.backgroundColor = UIColor.lightBackgroundColor
                 if product.count > 0 {
-                    productCell.cellColor = UIColor.cellSelectColor
+                    productCell.cellColor = colorTheme.cellSelectColor
                     productCell.productCountLabel.isHidden = false
                 } else {
-                    productCell.cellColor = UIColor.cellColor
+                    productCell.cellColor = colorTheme.cellColor
                     productCell.productCountLabel.isHidden = true
                 }
                 productCell.productCountLabel.text = String(product.count)
