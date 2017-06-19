@@ -97,9 +97,14 @@ class ProductsViewController: UIViewController, UITableViewDelegate, UITableView
         textField.layer.borderColor = UIColor.darkBrownTextColor.cgColor
         textField.layer.borderWidth = 2.0
         textField.layer.cornerRadius = defaultCornerRadius
+        let textFieldSwipeGesture = UISwipeGestureRecognizer(target: self, action: #selector(handleTextFieldSwipe(gesture:)))
+        textFieldSwipeGesture.direction = .left
+        textField.addGestureRecognizer(textFieldSwipeGesture)
+        
         configureShopButtons()
         configureSortingButtons()
         addSwipeGestureToTableView()
+        
         guard let shop1Name = userDefaults.string(forKey:"shop1Name"),
             let shop2Name = userDefaults.string(forKey:"shop2Name"),
             let shop3Name = userDefaults.string(forKey:"shop3Name"),
@@ -157,6 +162,8 @@ class ProductsViewController: UIViewController, UITableViewDelegate, UITableView
         }
     }
     
+    // MARK: - gesture handlers
+    
     func handleLongPressOfShopButton(gesture: UILongPressGestureRecognizer) {
         if gesture.state == .began {
             var shopIndex = 0
@@ -166,7 +173,7 @@ class ProductsViewController: UIViewController, UITableViewDelegate, UITableView
                 }
             }
             print("longPressed")
-            let alert = UIAlertController(title: "Rename \(shops[shopIndex].name!)", message: "Enter new name", preferredStyle: .alert)
+            let alert = UIAlertController(title: "Rename \(shops[shopIndex].name!)", message: nil, preferredStyle: .alert)
             
             let cancelAction = UIAlertAction(title: "Cancel", style: .cancel)
             let saveAction = UIAlertAction(title: "Save", style: .default, handler: { (alertAction) in
@@ -175,7 +182,7 @@ class ProductsViewController: UIViewController, UITableViewDelegate, UITableView
                 self.saveButtonTitlesToUserDefaults()
             })
             alert.addTextField(configurationHandler: { textField in
-                textField.placeholder = "New name"
+                textField.text = self.shops[shopIndex].name!
                 textField.autocapitalizationType = .sentences
             })
             alert.addAction(saveAction)
@@ -223,6 +230,12 @@ class ProductsViewController: UIViewController, UITableViewDelegate, UITableView
         userDefaults.set(ListOrder.alphabetically.rawValue, forKey: "productListsSorting")
     }
     
+    func handleTextFieldSwipe(gesture: UISwipeGestureRecognizer) {
+        textField.text = ""
+        searchText = ""
+    }
+    
+    // MARK: - Help and action methods
     private func saveButtonTitlesToUserDefaults() {
         for index in 0..<shops.count {
             userDefaults.set(shops[index].name, forKey: "shop\(index+1)Name")
@@ -308,7 +321,7 @@ class ProductsViewController: UIViewController, UITableViewDelegate, UITableView
             if let text = searchText {
                 let newText = "*\(text)*"
                 print("predicate text = \(text)")
-                request.predicate = NSPredicate(format: "name LIKE[cd] %@", newText)
+                request.predicate = NSPredicate(format: "name LIKE[c] %@", newText)
             }
             request.sortDescriptors = [NSSortDescriptor(key: sortingKey, ascending: sortAscending)]
             fetchedResultsController = NSFetchedResultsController(
@@ -319,6 +332,38 @@ class ProductsViewController: UIViewController, UITableViewDelegate, UITableView
             try? fetchedResultsController?.performFetch()
             fetchedResultsController?.delegate = self
             tableView.reloadData()
+        }
+    }
+    
+    private func addItemToList(_ item: String) {
+        // here we create or fetch item to/from db and add it to the list
+        let trimmedString = item.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
+        if let context = container?.viewContext {
+            let item = try? Product.findOrCreateProduct(matching: trimmedString, in: context)
+            //item?.product = product
+            if item != nil {
+                if item!.count == 0 {
+                    item!.inTheListCount = item!.inTheListCount + 1
+                    item!.lastAddedToList = NSDate()
+                    item!.isPicked = false
+                    shoppingList?.addToProducts(item!)
+                }
+                let count = item!.count
+                print(count)
+                item!.count = count + 1
+            }
+            try? context.save()
+        }
+        
+        //updateUI()
+        //printProducts()
+    }
+    
+    private func printProducts() {
+        if let products = fetchedResultsController?.fetchedObjects {
+            for product in products {
+                print("product \(product.name) shop1OrderNumber = \(product.shop1OrderNumber)")
+            }
         }
     }
     
@@ -419,14 +464,14 @@ class ProductsViewController: UIViewController, UITableViewDelegate, UITableView
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if tableView.isEditing {
             if let product = fetchedResultsController?.object(at: indexPath) {
-                let alert = UIAlertController(title: "Rename \(product.name ?? "product")", message: "Enter new name", preferredStyle: .alert)
+                let alert = UIAlertController(title: "Rename \(product.name ?? "product")", message: nil, preferredStyle: .alert)
                 
                 let cancelAction = UIAlertAction(title: "Cancel", style: .cancel)
                 let saveAction = UIAlertAction(title: "Save", style: .default, handler: { (alertAction) in
                     product.name = alert.textFields?[0].text
                 })
                 alert.addTextField(configurationHandler: { textField in
-                    textField.placeholder = "New name"
+                    textField.text = product.name ?? ""
                     textField.autocapitalizationType = .sentences
                 })
                 
@@ -464,39 +509,6 @@ class ProductsViewController: UIViewController, UITableViewDelegate, UITableView
         searchText = sender.text
     }
     
-    // MARK: - help methods
-    
-    private func addItemToList(_ item: String) {
-        // here we create or fetch item to/from db and add it to the list
-        let trimmedString = item.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
-        if let context = container?.viewContext {
-            let item = try? Product.findOrCreateProduct(matching: trimmedString, in: context)
-            //item?.product = product
-            if item != nil {
-                if item!.count == 0 {
-                    item!.inTheListCount = item!.inTheListCount + 1
-                    item!.lastAddedToList = NSDate()
-                    item!.isPicked = false
-                    shoppingList?.addToProducts(item!)
-                }
-                let count = item!.count
-                print(count)
-                item!.count = count + 1
-            }
-            try? context.save()
-        }
-        
-        //updateUI()
-        //printProducts()
-    }
-    
-    private func printProducts() {
-        if let products = fetchedResultsController?.fetchedObjects {
-            for product in products {
-                print("product \(product.name) shop1OrderNumber = \(product.shop1OrderNumber)")
-            }
-        }
-    }
 
     // MARK: FetchedResultsController delegate
     public func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
