@@ -31,9 +31,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let navigationBarAppearace = UINavigationBar.appearance()
         navigationBarAppearace.tintColor = UIColor.white
         navigationBarAppearace.barTintColor = colorTheme.darkestColor
-        let attributes = [NSForegroundColorAttributeName:UIColor.white, NSFontAttributeName: UIFont(name: "Noteworthy", size: 20)]
-        navigationBarAppearace.titleTextAttributes = attributes
+        navigationBarAppearace.titleTextAttributes = [NSForegroundColorAttributeName:UIColor.white, NSFontAttributeName: UIFont(name: "Noteworthy", size: 20)!]
+        UIApplication.shared.registerUserNotificationSettings(UIUserNotificationSettings(types: .badge, categories: nil))
+        
         UIApplication.shared.statusBarStyle = .lightContent
+        
         return true
     }
 

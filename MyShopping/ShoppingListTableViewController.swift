@@ -15,9 +15,6 @@ class ShoppingListTableViewController: FetchedResultsTableViewController {
     
     var fetchedResultsController: NSFetchedResultsController<Product>?
     
-    // imageArray for background images, tuple with name and boolean to indicate if image is dark.
-    let imageArray = [("tableViewBackground1", false), ("tableViewBackground2", false), ("tableViewBackground3", true), ("tableViewBackground4", false), ("tableViewBackground5", true)]
-    
     var container: NSPersistentContainer? = (UIApplication.shared.delegate as? AppDelegate)?.persistentContainer {
         didSet {
             updateUI()
@@ -33,6 +30,8 @@ class ShoppingListTableViewController: FetchedResultsTableViewController {
     var shoppingList: ShoppingList?
     
     private let userDefaults = UserDefaults.standard
+    
+    var pickedItemsToBottom = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -50,24 +49,8 @@ class ShoppingListTableViewController: FetchedResultsTableViewController {
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        pickedItemsToBottom = userDefaults.bool(forKey: SettingKeys.pickedItemsToBottomSetting)
         tableView.backgroundColor = colorTheme.lightBackgroundColor
-        let frame = tableView.frame
-        let backgroundImageView = UIImageView(frame: frame)
-        let randomImageNumber = 5.randomNumber()
-        let (imageName, _) = imageArray[randomImageNumber]
-        /*
-        if (isDark) {
-            navigationController?.navigationBar.barStyle = .black
-            navigationController?.navigationBar.tintColor = UIColor.white
-        } else {
-             navigationController?.navigationBar.barStyle = .default
-            navigationController?.navigationBar.tintColor = UIColor.black
-        }
-         */
-        print(randomImageNumber)
-        backgroundImageView.image = UIImage(named: imageName)
-        backgroundImageView.image = nil
-        tableView.backgroundView = backgroundImageView
         updateUI()
     }
     
@@ -108,6 +91,7 @@ class ShoppingListTableViewController: FetchedResultsTableViewController {
                         }
                     }
                     try? context.save()
+                    
                 }
             }
         }
@@ -138,7 +122,11 @@ class ShoppingListTableViewController: FetchedResultsTableViewController {
         let sortingKey = "shop\(selectedShopIndex+1)OrderNumber"
         if let context = container?.viewContext {
             let request: NSFetchRequest<Product> = Product.fetchRequest()
-            request.sortDescriptors = [NSSortDescriptor(key: sortingKey, ascending: true)]
+            if pickedItemsToBottom {
+                request.sortDescriptors = [NSSortDescriptor(key: "isPicked", ascending: true), NSSortDescriptor(key: sortingKey, ascending: true)]
+            } else {
+                request.sortDescriptors = [NSSortDescriptor(key: sortingKey, ascending: true)]
+            }
             request.predicate = NSPredicate(format: "ANY shoppingList.name LIKE[cd] %@", shoppingList?.name ?? "Shopping List")
             fetchedResultsController = NSFetchedResultsController(
                 fetchRequest: request,
@@ -148,6 +136,18 @@ class ShoppingListTableViewController: FetchedResultsTableViewController {
             try? fetchedResultsController?.performFetch()
             fetchedResultsController?.delegate = self
             tableView.reloadData()
+        }
+    }
+    
+    private func updateBadgeCount() {
+        if let fetchedObjects = fetchedResultsController?.fetchedObjects {
+            var count = 0
+            for item in fetchedObjects {
+                if !item.isPicked {
+                    count = count + 1
+                }
+            }
+            UIApplication.shared.applicationIconBadgeNumber = count
         }
     }
     
@@ -208,7 +208,6 @@ class ShoppingListTableViewController: FetchedResultsTableViewController {
     
 
     private func openSettings() {
-        print("Settings opened")
         performSegue(withIdentifier: "showSettings", sender: nil)
     }
     
@@ -290,59 +289,18 @@ class ShoppingListTableViewController: FetchedResultsTableViewController {
                 try? context.save()
             }
         }
-        
     }
-    
-    /*
-    // Override to support conditional editing of the table view.
-    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the specified item to be editable.
-        return true
-    }
-    */
-
-    /*
-    // Override to support editing the table view.
-    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete {
-            // Delete the row from the data source
-            tableView.deleteRows(at: [indexPath], with: .fade)
-        } else if editingStyle == .insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
-    }
-    */
-
     
     // Override to support rearranging the table view.
     override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
 
     }
     
-
-    /*
-    // Override to support conditional rearranging of the table view.
-    override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the item to be re-orderable.
-        return true
+    // MARK: - FRC
+    override func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        super.controllerDidChangeContent(controller)
+        updateBadgeCount()
     }
-    */
-
-    
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    /*
-     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-        if segue.identifier == "addItems" {
-            if let vc = segue.destination as? ProductsViewController {
-            }
-        }
-    }
-     */
-
 }
 
 extension ShoppingListTableViewController

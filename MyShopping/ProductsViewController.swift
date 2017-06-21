@@ -175,7 +175,6 @@ class ProductsViewController: UIViewController, UITableViewDelegate, UITableView
                     shopIndex = index
                 }
             }
-            print("longPressed")
             let alert = UIAlertController(title: "Rename \(shops[shopIndex].name!)", message: nil, preferredStyle: .alert)
             
             let cancelAction = UIAlertAction(title: "Cancel", style: .cancel)
@@ -262,17 +261,14 @@ class ProductsViewController: UIViewController, UITableViewDelegate, UITableView
         // update selected shop and shop labels
         switch listSortedBy {
         case .alphabetically:
-            print("alphabetically")
             sortAlphabeticallyButton.image = UIImage(named: "sort-az-selected")
             sortByTimeButton.image = UIImage(named: "sort-time")
             sortByShopButton.image = UIImage(named: "sort-shop")
         case .recency:
-            print("by time")
             sortByTimeButton.image = UIImage(named: "sort-time-selected")
             sortAlphabeticallyButton.image = UIImage(named: "sort-az")
             sortByShopButton.image = UIImage(named: "sort-shop")
         case .shop:
-            print("by shop")
             sortByShopButton.image = UIImage(named: "sort-shop-selected")
             sortByTimeButton.image = UIImage(named: "sort-time")
             sortAlphabeticallyButton.image = UIImage(named: "sort-az")
@@ -281,11 +277,11 @@ class ProductsViewController: UIViewController, UITableViewDelegate, UITableView
             shopLabels[index].text = shops[index].name
             
             if shops[index].isSelected {
-                UIView.animate(withDuration: 0.3, animations: {
+                UIView.animate(withDuration: 0.2, animations: {
                     self.shopViews[index].backgroundColor = self.colorTheme.cellSelectColor
                 })
             } else  {
-                UIView.animate(withDuration: 0.3, animations: {
+                UIView.animate(withDuration: 0.2, animations: {
                     self.shopViews[index].backgroundColor = self.colorTheme.cellColor
                 })
             }
@@ -300,16 +296,13 @@ class ProductsViewController: UIViewController, UITableViewDelegate, UITableView
         
         switch listSortedBy {
         case .alphabetically:
-            print("a-z")
             sortingKey = "name"
             sectionNameKeyPath = "name"
         case .recency:
-            print("time")
             sortingKey = "lastAddedToList"
             sortAscending = false
             sectionNameKeyPath = nil
         case .shop:
-            print("shop")
             for index in 0..<shops.count {
                 if shops[index].isSelected {
                     sortingKey = "shop\(index+1)OrderNumber"
@@ -318,12 +311,10 @@ class ProductsViewController: UIViewController, UITableViewDelegate, UITableView
             sectionNameKeyPath = nil
         }
         
-        print("sortingKey = \(sortingKey)")
         if let context = container?.viewContext {
             let request: NSFetchRequest<Product> = Product.fetchRequest()
             if let text = searchText {
                 let newText = "*\(text)*"
-                print("predicate text = \(text)")
                 request.predicate = NSPredicate(format: "name LIKE[c] %@", newText)
             }
             request.sortDescriptors = [NSSortDescriptor(key: sortingKey, ascending: sortAscending)]
@@ -352,7 +343,6 @@ class ProductsViewController: UIViewController, UITableViewDelegate, UITableView
                     shoppingList?.addToProducts(item!)
                 }
                 let count = item!.count
-                print(count)
                 item!.count = count + 1
             }
             try? context.save()
@@ -367,6 +357,18 @@ class ProductsViewController: UIViewController, UITableViewDelegate, UITableView
             for product in products {
                 print("product \(product.name) shop1OrderNumber = \(product.shop1OrderNumber)")
             }
+        }
+    }
+    
+    private func updateBadgeCount() {
+        if let fetchedObjects = fetchedResultsController?.fetchedObjects {
+            var count = 0
+            for item in fetchedObjects {
+                if item.count > 0 && !item.isPicked {
+                    count = count + 1
+                }
+            }
+            UIApplication.shared.applicationIconBadgeNumber = count
         }
     }
     
@@ -411,7 +413,6 @@ class ProductsViewController: UIViewController, UITableViewDelegate, UITableView
     }
     
     func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
-        print("moving")
         // get moved cell
         // update its order number for current selected shop
         // update order numbers for cells from source to destination indexpaths like so:
@@ -446,7 +447,6 @@ class ProductsViewController: UIViewController, UITableViewDelegate, UITableView
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
             // handle deleting product
-            print("delete tapped")
             if let product = fetchedResultsController?.object(at: indexPath) {
                 if let context = container?.viewContext {
                     context.delete(product)
@@ -542,6 +542,7 @@ class ProductsViewController: UIViewController, UITableViewDelegate, UITableView
     
     public func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         tableView.endUpdates()
+        updateBadgeCount()
     }
     
 
