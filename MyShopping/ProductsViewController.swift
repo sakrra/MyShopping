@@ -377,10 +377,15 @@ class ProductsViewController: UIViewController, UITableViewDelegate, UITableView
     // MARK: - Table view data source
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "productCell", for: indexPath)
-
-        // Configure the cell...
-        if let product = fetchedResultsController?.object(at: indexPath) {
+        guard let objects = fetchedResultsController?.fetchedObjects else {
+            let cell = tableView.dequeueReusableCell(withIdentifier: "summaryCell", for: indexPath)
+            cell.textLabel?.text = "0 items"
+            return cell
+        }
+        //if let product = fetchedResultsController?.object(at: indexPath) {
+        if indexPath.row < objects.count {
+            let cell = tableView.dequeueReusableCell(withIdentifier: "productCell", for: indexPath)
+            let product = objects[indexPath.row]
             if let productCell = cell as? ProductTableViewCell {
                 productCell.productName = product.name
                 //productCell.backgroundColor = UIColor.lightBackgroundColor
@@ -392,22 +397,53 @@ class ProductsViewController: UIViewController, UITableViewDelegate, UITableView
                     productCell.productCountLabel.isHidden = true
                 }
                 productCell.productCountLabel.text = String(product.count)
+                return productCell
+            } else {
+                return tableView.dequeueReusableCell(withIdentifier: "summaryCell", for: indexPath)
             }
+        } else {
+            let cell = tableView.dequeueReusableCell(withIdentifier: "summaryCell", for: indexPath)
+            cell.textLabel?.text = "\(objects.count) items"
+            return cell
         }
-
-        return cell
+        
     }
     
     func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
         if listSortedBy == .shop {
-            return true
+            guard let objects = fetchedResultsController?.fetchedObjects else {
+                return false
+            }
+            if indexPath.row < objects.count {
+                return true
+            } else {
+                return false
+            }
         } else {
             return false
         }
     }
     
     func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        return true
+        guard let objects = fetchedResultsController?.fetchedObjects else {
+            return false
+        }
+        if indexPath.row < objects.count {
+            return true
+        } else {
+            return false
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, targetIndexPathForMoveFromRowAt sourceIndexPath: IndexPath, toProposedIndexPath proposedDestinationIndexPath: IndexPath) -> IndexPath {
+        guard let objects = fetchedResultsController?.fetchedObjects else {
+            return proposedDestinationIndexPath
+        }
+        if proposedDestinationIndexPath.row == objects.count {
+            return IndexPath(row: proposedDestinationIndexPath.row-1, section: proposedDestinationIndexPath.section)
+        } else {
+            return proposedDestinationIndexPath
+        }
     }
     
     func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
@@ -444,7 +480,8 @@ class ProductsViewController: UIViewController, UITableViewDelegate, UITableView
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
             // handle deleting product
-            if let product = fetchedResultsController?.object(at: indexPath) {
+            if let products = fetchedResultsController?.fetchedObjects {
+                let product = products[indexPath.row]
                 if let context = container?.viewContext {
                     context.delete(product)
                     try? context.save()
@@ -539,6 +576,9 @@ class ProductsViewController: UIViewController, UITableViewDelegate, UITableView
     
     public func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         tableView.endUpdates()
+        if let products = fetchedResultsController?.fetchedObjects {
+            tableView.reloadRows(at: [IndexPath(row: products.count, section: 0)], with: .fade)
+        }
         updateBadgeCount()
     }
     
