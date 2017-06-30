@@ -1,22 +1,29 @@
 //
-//  SettingsViewController.swift
+//  HelpViewController.swift
 //  MyShopping
 //
-//  Created by Sami Rämö on 01/06/2017.
+//  Created by Sami Rämö on 28/06/2017.
 //  Copyright © 2017 Sami Ramo. All rights reserved.
 //
 
 import UIKit
 
-class SettingsViewController: UITableViewController {
+class HelpViewController: UIViewController {
 
-    private let userDefaults = UserDefaults.standard
+    @IBOutlet weak var imageView: UIImageView!
     
-    @IBOutlet weak var pickedItemSettingSwitch: UISwitch!
+    @IBOutlet weak var exitButton: UIButton!
+    
+    var imageName: String?
+    
+    var pageIndex = 0
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        pickedItemSettingSwitch.setOn(userDefaults.bool(forKey: SettingKeys.pickedItemsToBottomSetting), animated: false)
+        imageView.image = UIImage(named: imageName!)
+        exitButton.backgroundColor = UIColor.white
+        exitButton.layer.cornerRadius = 23.0
+        // Do any additional setup after loading the view.
     }
 
     override func didReceiveMemoryWarning() {
@@ -24,8 +31,7 @@ class SettingsViewController: UITableViewController {
         // Dispose of any resources that can be recreated.
     }
     
-    @IBAction func pickedItemsSettingChanged(_ sender: UISwitch) {
-        userDefaults.set(sender.isOn, forKey: SettingKeys.pickedItemsToBottomSetting)
+    @IBAction func exit(_ sender: UIButton) {
     }
 
     /*
@@ -37,7 +43,5 @@ class SettingsViewController: UITableViewController {
         // Pass the selected object to the new view controller.
     }
     */
-    
-    @IBAction func unwindToThisViewController(segue: UIStoryboardSegue) {
-    }
+
 }

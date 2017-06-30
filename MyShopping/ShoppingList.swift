@@ -23,7 +23,6 @@ class ShoppingList: NSManagedObject {
         } catch {
             throw error
         }
-        print(context)
         let shoppingList = ShoppingList(context: context)
         shoppingList.name = name
         return shoppingList

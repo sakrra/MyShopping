@@ -45,16 +45,6 @@ class ShoppingListTableViewCell: UITableViewCell {
         strikeImageView.backgroundColor = colorTheme.strikeColor
     }
 
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        /*let newFrame = cellBackgroundView.frame
-        print("newFrame \(newFrame)")
-        print("cellBackgroundView.bounds \(cellBackgroundView.bounds)")
-        strikethroughView.frame = CGRect(x: StrikethroughConstants.spacing, y: (newFrame.height-StrikethroughConstants.height)/2, width: newFrame.width-(4*StrikethroughConstants.spacing), height: StrikethroughConstants.height)
-        print("cellBackgroundView.frame \(cellBackgroundView.frame)")
-        print("strikethroughView.frame \(strikethroughView.frame)")*/
-    }
-    
 
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)

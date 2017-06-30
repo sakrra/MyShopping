@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		107066200D93AF9FDD356DDC /* Pods_MyShoppingUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D083B5461FD9A7EA8DA4A316 /* Pods_MyShoppingUITests.framework */; };
+		262B4E4C1F03B35D00016F87 /* HelpViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 262B4E4B1F03B35D00016F87 /* HelpViewController.swift */; };
+		262B4E4E1F03B48600016F87 /* HelpPageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 262B4E4D1F03B48600016F87 /* HelpPageViewController.swift */; };
 		267F561C1EC46747007C6D0B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 267F561B1EC46747007C6D0B /* AppDelegate.swift */; };
 		267F56211EC46747007C6D0B /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 267F561F1EC46747007C6D0B /* Main.storyboard */; };
 		267F56241EC46747007C6D0B /* MyShopping.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 267F56221EC46747007C6D0B /* MyShopping.xcdatamodeld */; };
@@ -51,6 +53,8 @@
 
 /* Begin PBXFileReference section */
 		11E81D779151C54000F887D2 /* Pods-MyShopping.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MyShopping.debug.xcconfig"; path = "Pods/Target Support Files/Pods-MyShopping/Pods-MyShopping.debug.xcconfig"; sourceTree = "<group>"; };
+		262B4E4B1F03B35D00016F87 /* HelpViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HelpViewController.swift; sourceTree = "<group>"; };
+		262B4E4D1F03B48600016F87 /* HelpPageViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HelpPageViewController.swift; sourceTree = "<group>"; };
 		267F56181EC46747007C6D0B /* MyShopping.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MyShopping.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		267F561B1EC46747007C6D0B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		267F56201EC46747007C6D0B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -145,10 +149,12 @@
 				267F561F1EC46747007C6D0B /* Main.storyboard */,
 				267F564C1EC47F6F007C6D0B /* ShoppingListTableViewController.swift */,
 				267F564E1EC47F88007C6D0B /* ShoppingListTableViewCell.swift */,
-				26E40BC91EE0969D00DABE4A /* SettingsViewController.swift */,
-				26E40BCB1EE097DE00DABE4A /* SettingKeys.swift */,
 				267F56581EC4BC3F007C6D0B /* ProductsViewController.swift */,
 				26E080691EF1287F005D16D2 /* ProductTableViewCell.swift */,
+				26E40BC91EE0969D00DABE4A /* SettingsViewController.swift */,
+				26E40BCB1EE097DE00DABE4A /* SettingKeys.swift */,
+				262B4E4D1F03B48600016F87 /* HelpPageViewController.swift */,
+				262B4E4B1F03B35D00016F87 /* HelpViewController.swift */,
 				267F56541EC48918007C6D0B /* AppColors.swift */,
 				26E40BC31ED5E04800DABE4A /* FetchedResultsTableViewController.swift */,
 				26E40BC41ED5E04800DABE4A /* UITableViewDataSource+NSFetchedResultsController.swift */,
@@ -507,7 +513,9 @@
 				267F56591EC4BC3F007C6D0B /* ProductsViewController.swift in Sources */,
 				26E40BC61ED5E04800DABE4A /* UITableViewDataSource+NSFetchedResultsController.swift in Sources */,
 				267F564D1EC47F6F007C6D0B /* ShoppingListTableViewController.swift in Sources */,
+				262B4E4E1F03B48600016F87 /* HelpPageViewController.swift in Sources */,
 				26E40BCC1EE097DE00DABE4A /* SettingKeys.swift in Sources */,
+				262B4E4C1F03B35D00016F87 /* HelpViewController.swift in Sources */,
 				26E40BCA1EE0969D00DABE4A /* SettingsViewController.swift in Sources */,
 				26E40BC51ED5E04800DABE4A /* FetchedResultsTableViewController.swift in Sources */,
 				267F56551EC48918007C6D0B /* AppColors.swift in Sources */,

@@ -124,7 +124,6 @@ class ProductsViewController: UIViewController, UITableViewDelegate, UITableView
                  Shop(name: shop3Name, isSelected: selectedShopIndex == 2),
                  Shop(name: shop4Name, isSelected: selectedShopIndex == 3)]
         updateUI()
-        printProducts()
     }
 
     private func configureShopButtons() {
@@ -347,11 +346,9 @@ class ProductsViewController: UIViewController, UITableViewDelegate, UITableView
             }
             try? context.save()
         }
-        
-        //updateUI()
-        //printProducts()
     }
     
+    /*
     private func printProducts() {
         if let products = fetchedResultsController?.fetchedObjects {
             for product in products {
@@ -359,6 +356,7 @@ class ProductsViewController: UIViewController, UITableViewDelegate, UITableView
             }
         }
     }
+    */
     
     private func updateBadgeCount() {
         if let fetchedObjects = fetchedResultsController?.fetchedObjects {
@@ -441,7 +439,6 @@ class ProductsViewController: UIViewController, UITableViewDelegate, UITableView
                 }
             }
         }
-        printProducts()
     }
     
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
