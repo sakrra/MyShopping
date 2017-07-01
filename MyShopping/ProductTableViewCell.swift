@@ -36,8 +36,20 @@ class ProductTableViewCell: UITableViewCell {
         super.awakeFromNib()
         // Initialization code
         cellBackgroundView.layer.cornerRadius = 5.0
-        contentView.backgroundColor = colorTheme.lightBackgroundColor
+        contentView.backgroundColor = UIColor.clear
         selectionStyle = .none
     }
     
+    override func setSelected(_ selected: Bool, animated: Bool) {
+        super.setSelected(selected, animated: animated)
+        
+        // Configure the view for the selected state
+        //if selected {
+        //    cellColor = UIColor.cellSelectColor
+        //    //selectedBackgroundView?.backgroundColor = UIColor.black
+        //    //backgroundView?.backgroundColor = UIColor.black
+        //} else {
+        //    cellBackgroundView.backgroundColor = cellColor
+        //}
+    }
 }
